@@ -7,9 +7,12 @@ from datetime import datetime
 
 browser = webdriver.Chrome('C:\\Users\\DanFang\\Downloads\\chromedriver_win32\\chromedriver.exe')
 browser.implicitly_wait(3)
-url = 'http://www.ysusports.com/sports/fball/2017-18/schedule'
+url = 'http://www.ticketmaster.com/artist/1373960?tm_link=tm_changeloc_cities'
 browser.get(url)
 
+browser.find_element_by_id('nextPage').click();
+browser.find_element_by_id('nextPage').click();
+browser.find_element_by_id('nextPage').click();
 #select = Select(browser.find_element_by_class_name('filter-group__dropdown-select'))
 
 #select.select_by_visible_text('2017-18 Regular Season')
@@ -18,28 +21,29 @@ innerHTML = browser.execute_script("return document.body.innerHTML")
 print(innerHTML)
 
 tree = html.fromstring(innerHTML)
-dates = tree.xpath("//div[@class='date clearfix']/span[position()=2]/text()")
-days = tree.xpath("//div[@class='date clearfix']/span[position()=3]/text()")
-times = tree.xpath("//div[@class='status clearfix']/span/text()")
-away_teams = tree.xpath("//div[@class='team clearfix']/span[@class='name']/text()")
+dates = tree.xpath("//div[@class='month']/abbr/text()")
+days = tree.xpath("//div[@class='date']/text()")
+times = tree.xpath("//div[@class='padH10']/text()")
+away_teams = tree.xpath("//span[@class='eventName']/text()")
 #home_teams = tree.xpath("//ul[contains(@class, 'game-teams')]/li[position()=2]/text()")
-#venues = tree.xpath("//li[@class='schedule-game__game-location schedule-col-5']/a/div/div[@class='game-feature__title']/text()")
+venues = tree.xpath("//a[@class='event']/text()")
 
 print(dates)
 print(days)
 print(away_teams)
 #print(home_teams)
 print(times)
-#print(venues)
+print(venues)
 
-str_away_teams = away_teams[::2]
-str_home_teams = away_teams[1::2]
-print(str_away_teams)
-print(str_home_teams)
+# str_away_teams = away_teams[::2]
+# str_home_teams = away_teams[1::2]
+# print(str_away_teams)
+# print(str_home_teams)
 #str_home_teams = list(filter(lambda x: x != "", map(lambda x: str(x).replace("\n", "").strip().title(), home_teams)))
 
 
-
+str_times = times[1::2]
+print(str_times)
 
 # print(datetime.strptime(dates[1], '%b %d (%a)'))
 # print(opponents)
@@ -56,7 +60,7 @@ game_dates = []
 
 
 for i in range(0, len(dates)):
-    game_dates.append(datetime.strptime(dates[i] + " " + days[i] + " 2017 " + times[i], '%b %d %Y %I:%M %p'))
+    game_dates.append(datetime.strptime(dates[i] + " " + days[i] + " 2018 " + str_times[i], '%b %d %Y %I:%M %p'))
 
 print(game_dates)
 
@@ -69,10 +73,10 @@ sheet = out_workbook.active
 
 row_count = 1
 for i in range(0, len(game_dates)):
-    if "Youngstown State" in str_home_teams[i]:
+    if "Covelli Centre" in venues[i]:
         sheet['A' + str(row_count)] = game_dates[i]
-        sheet['B' + str(row_count)] = str_home_teams[i] + " Football vs. " + str_away_teams[i]
+        sheet['B' + str(row_count)] = away_teams[i]
         # sheet['C' + str(row_count)] = venues[i]
         row_count += 1
 
-out_workbook.save("YoungstownFootball.xlsx")
+out_workbook.save("YoungstownPhantoms4.xlsx")

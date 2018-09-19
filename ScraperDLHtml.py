@@ -119,5 +119,5 @@ for i in range(0, len(seats_together_clean)):
     # sheet['C' + str(row_count)] = venues[i]
     row_count += 1
 
-out_workbook.save("vikings2-1.xlsx")
+out_workbook.save("vikings2-7.xlsx")
 

@@ -10,7 +10,7 @@ browser = webdriver.Chrome('C:\\Users\\DanFang\\Documents\\chromedriver.exe')
 browser.implicitly_wait(3)
 
 
-url = 'https://www.clevelandmonsters.com/schedule/2018-19-schedule'
+url = 'https://pittsburghpanthers.com/schedule.aspx?path=wbball'
 browser.get(url)
 
 SCROLL_PAUSE_TIME = 0.8
@@ -47,12 +47,12 @@ print(innerHTML)
 
 
 tree = html.fromstring(innerHTML)
-days = tree.xpath("//div[@class='schedule-item grid-subcontainer home']/div/div/h5[@class='date']/text()")
+days = tree.xpath("//div[@class='sidearm-schedule-game-opponent-date flex-item-1']/span[position()=1]/text()")
 # days = tree.xpath("//tbody[@class='date-tbody home-game future-game']/tr/td/div/div[@class='date-label']/text()")
-times = tree.xpath("//div[@class='schedule-item grid-subcontainer home']/div/h6[@class='time']/text()")
-away_teams = tree.xpath("//div[@class='schedule-item grid-subcontainer home']/div/h5[@class='grid-item opponent']/text()")
+times = tree.xpath("//div[@class='sidearm-schedule-game-opponent-date flex-item-1']/span[position()=2]/text()")
+away_teams = tree.xpath("//div[@class='sidearm-schedule-game-opponent-text']/span[position()=2]/a/text()")
 # home_teams = tree.xpath("//ul[contains(@class, 'game-teams')]/li[position()=2]/text()")
-#venues = tree.xpath("//div[@class='sidearm-schedule-game-location']/span[position()=1]/text()")
+venues = tree.xpath("//div[@class='sidearm-schedule-game-location']/span[position()=1]/text()")
 # is_away = tree.xpath("//div[@class='sidearm-schedule-game-opponent-text']/span[position()=1]/text()")
 # dates = list(filter(lambda x: x != '\n', orig_dates))
 
@@ -61,21 +61,21 @@ print(days)
 # print(days, len(days))
 print(times, len(times))
 print(away_teams, len(away_teams))
-#print(venues)
+print(venues)
 # print(is_away, len(is_away))
 # print(away_teams)
 """
 # print(home_teams)
 print(times)
 print(venues)
-
+"""
 # str_away_teams = list(filter(lambda x: x != "", map(lambda x: str(x).replace("\n", "").strip().title(), away_teams)))
 # str_home_teams = list(filter(lambda x: x != "", map(lambda x: str(x).replace("\n", "").strip().title(), home_teams)))
 # print(str_away_teams)
 # print(str_home_teams)
 #str_home_teams = list(filter(lambda x: x != "", map(lambda x: str(x).replace("\n", "").strip().title(), home_teams)))
 
-
+"""
 # str_times = times[1::2]
 # print(str_times)
 
@@ -90,10 +90,11 @@ print(venues)
 """
 game_dates = []
 
-#year_break = "Jan 2 (Wed)"
-for i in range(0, len(days)):
-    game_dates.append(datetime.strptime(days[i] + " " + times[i], '%B %d, %Y %I:%M %p'))
-
+year_break = "Jan 3 (Thu)"
+for i in range(0, days.index(year_break)):
+    game_dates.append(datetime.strptime(days[i] + " 2018 " + times[i].replace("TBA", "8 AM").replace("A.M.", "AM").replace("P.M.", "PM").replace(" ET", ""), '%b %d (%a) %Y %I %p'))
+for i in range(days.index(year_break), len(days)):
+    game_dates.append(datetime.strptime(days[i] + " 2019 " + times[i].replace("TBA", "8 AM").replace("A.M.", "AM").replace("P.M.", "PM").replace(" ET", "").replace("Mar 10 (Sun)", "8 AM"), '%b %d (%a) %Y %I %p'))
 
 print(game_dates)
 # real_dates = []
@@ -122,11 +123,13 @@ out_workbook = openpyxl.Workbook()
 sheet = out_workbook.active
 
 row_count = 1
-for i in range(0, len(game_dates)):
-    sheet['A' + str(row_count)] = game_dates[i]
-    sheet['B' + str(row_count)] = "Cleveland Monsters " + away_teams[i]
+for i in range(0, len(away_teams)):
+    #Wsheet['A' + str(row_count)] = game_dates[i]
+    sheet['B' + str(row_count)] = "Pitt Panthers Women's Basketball vs. " + away_teams[i]
     #.title().replace("\n", "").replace("\t", "").strip()
     #sheet['C' + str(row_count)] = times[i]
     row_count += 1
 
-out_workbook.save("monsters20182019.xlsx")
+out_workbook.save("pittwbb2018opps.xlsx")
+
+browser.quit()
